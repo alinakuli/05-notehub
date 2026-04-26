@@ -1,6 +1,7 @@
 import css from './NoteForm.module.css';
 import { useFormik } from 'formik';
 import type { Note } from '../../types/note.ts';
+import * as Yup from "yup";
 
 interface NoteFormProps {
   onClose: () => void;
@@ -9,15 +10,31 @@ interface NoteFormProps {
 
 export default function NoteForm({ onClose, onCreateNote }: NoteFormProps) {
 
+  const Schema = Yup.object().shape({
+    title: Yup.string()
+      .min(3, "Title must be at least 3 characters")
+      .max(50, "Title is too long")
+      .required("Title is required"),
+    content: Yup.string()
+      .max(500, "Content is too long"),
+    tag: Yup.string()
+    .oneOf(
+      ["Todo", "Work", "Personal", "Meeting", "Shopping"],
+      "Invalid tag"
+    )
+    .required("Tag is required"),
+});
+
+
 
   const formik = useFormik({
     initialValues: {
-      id: 0,
       title: '',
       content: '',
       tag: 'Todo',
     },
-  onSubmit: async (values, { resetForm }) => {
+    validationSchema: Schema,
+  onSubmit: async (values: {title: string, content: string, tag: string}, { resetForm }) => {
   try {
     await onCreateNote(values); //
     resetForm();
