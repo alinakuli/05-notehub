@@ -6,9 +6,10 @@ import SearchBox from '../SearchBox/SearchBox.tsx';
 import Pagination from '../Pagination/Pagination.tsx';
 import Modal from '../Modal/Modal.tsx';
 import { StrictMode, useEffect, useState } from 'react';
-import { fetchNotes, createNote, deleteNote } from '../../services/noteService.ts';
+import { fetchNotes, deleteNote } from '../../services/noteService.ts';
 import NoteList from '../NoteList/NoteList.tsx';
 import { useDebouncedCallback } from 'use-debounce';
+import NoteForm from '../NoteForm/NoteForm.tsx';
 
 export default function App() {
   const noResults = () => toast('No notes found for your request.');
@@ -27,9 +28,12 @@ export default function App() {
   );
 
   const updateSearchQuery = useDebouncedCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value),
-    300
-  );
+  (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    setPage(1);
+  },
+  300
+);
 
   const notes = data?.notes ?? [];
   const totalPages = data?.totalPages ?? 0;
@@ -43,13 +47,6 @@ export default function App() {
   const handleCreateNote = () => {
     setIsModalOpen(true);
   }
-
-  const mutation = useMutation({
-    mutationFn: createNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notes'] });
-    },
-  });
 
   const onClose = () => {
     setIsModalOpen(false);
@@ -94,15 +91,12 @@ const deleteMutation = useMutation({
             <button className={css.button} onClick={handleCreateNote}>Create note +</button>
           </header>
 
-          {isModalOpen && (
-            <Modal
-  onClose={onClose}
-  onCreateNote={mutation.mutateAsync}
-/>
-          )}
+          {isModalOpen && (<Modal onClose={onClose}>
+              <NoteForm onClose={onClose} />
+            </Modal>)}
           {notes.length > 0 ? <NoteList
   notes={notes}
-  onDeleteNote={(note) => deleteMutation.mutate(note.id!)}
+  onDeleteNote={(note) => deleteMutation.mutate(note.id)}
 /> : null}
         </div>
         <Toaster />

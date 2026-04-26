@@ -21,7 +21,7 @@ interface PaginationProps {
   previousLabel: string;
 }
 
-export default function Pagination(PaginationProps: PaginationProps) {
+export default function Pagination(props: PaginationProps) {
   
   const {
     pageCount,
@@ -33,7 +33,7 @@ export default function Pagination(PaginationProps: PaginationProps) {
     activeClassName = css.active,
     nextLabel,
     previousLabel
-  } = PaginationProps;
+  } = props;
 
   return (
         <ReactPaginate

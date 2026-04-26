@@ -1,14 +1,16 @@
 import css from './NoteForm.module.css';
-import { useFormik } from 'formik';
-import type { Note } from '../../types/note.ts';
+import { ErrorMessage, useFormik } from 'formik';
+import type { CreateNoteInput } from '../../types/note.ts';
 import * as Yup from "yup";
+import { createNote } from '../../services/noteService.ts';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface NoteFormProps {
   onClose: () => void;
-  onCreateNote: (note: Note) => void;
 }
 
-export default function NoteForm({ onClose, onCreateNote }: NoteFormProps) {
+export default function NoteForm(props: NoteFormProps) {
+  const { onClose } = props;
 
   const Schema = Yup.object().shape({
     title: Yup.string()
@@ -23,27 +25,36 @@ export default function NoteForm({ onClose, onCreateNote }: NoteFormProps) {
       "Invalid tag"
     )
     .required("Tag is required"),
+  });
+  
+  const queryClient = useQueryClient();
+
+const mutation = useMutation({
+  mutationFn: createNote,
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['notes'] });
+  },
 });
 
 
 
-  const formik = useFormik({
+  const formik = useFormik<CreateNoteInput>({
     initialValues: {
       title: '',
       content: '',
-      tag: 'Todo',
+      tag: "Todo",
     },
     validationSchema: Schema,
-  onSubmit: async (values: {title: string, content: string, tag: string}, { resetForm }) => {
+  onSubmit: async (values, { resetForm }) => {
   try {
-    await onCreateNote(values); //
+    await mutation.mutateAsync(values);
     resetForm();
     onClose();
   } catch (error) {
     console.error(error);
   }
 },
-},);
+  });
 
   return (
     <>
@@ -51,9 +62,12 @@ export default function NoteForm({ onClose, onCreateNote }: NoteFormProps) {
   <div className={css.formGroup}>
     <label htmlFor="title">Title</label>
     <input id="title" type="text" name="title" className={css.input} value={formik.values.title} onChange={formik.handleChange} />
-    <span className={css.error}>
+    <ErrorMessage
+  name="title"
+  component="div"
+  className={css.error}
+/>
   {formik.touched.title && formik.errors.title}
-</span>
   </div>
 
   <div className={css.formGroup}>
@@ -66,9 +80,11 @@ export default function NoteForm({ onClose, onCreateNote }: NoteFormProps) {
       value={formik.values.content}
       onChange={formik.handleChange}
     />
-    <span className={css.error}>
-  {formik.touched.content && formik.errors.content}
-</span>
+    <ErrorMessage
+  name="content"
+  component="div"
+  className={css.error}
+/>
   </div>
 
   <div className={css.formGroup}>
@@ -80,9 +96,11 @@ export default function NoteForm({ onClose, onCreateNote }: NoteFormProps) {
       <option value="Meeting">Meeting</option>
       <option value="Shopping">Shopping</option>
     </select>
-    <span className={css.error}>
-  {formik.touched.tag && formik.errors.tag}
-</span>
+    <ErrorMessage
+  name="tag"
+  component="div"
+  className={css.error}
+/>
   </div>
 
   <div className={css.actions}>

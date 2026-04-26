@@ -1,6 +1,10 @@
 export interface Note {
-    id?: number,
+    id: string,
     title: string,
     content: string,
-    tag: string
+    createdAt: Date;
+    updatedAt: Date;
+    tag: 'Todo' | 'Work' | 'Personal' | 'Meeting' | 'Shopping'
 }
+
+export type CreateNoteInput = Omit<Note, 'id' | 'createdAt' | 'updatedAt'>;
