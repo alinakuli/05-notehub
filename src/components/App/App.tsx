@@ -102,7 +102,7 @@ const deleteMutation = useMutation({
           )}
           {notes.length > 0 ? <NoteList
   notes={notes}
-  onDeleteNote={(note) => deleteMutation.mutate(note.id)}
+  onDeleteNote={(note) => deleteMutation.mutate(note.id!)}
 /> : null}
         </div>
         <Toaster />
