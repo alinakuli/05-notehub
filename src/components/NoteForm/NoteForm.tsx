@@ -61,13 +61,12 @@ const mutation = useMutation({
     <form className={css.form} onSubmit={formik.handleSubmit}>
   <div className={css.formGroup}>
     <label htmlFor="title">Title</label>
-    <input id="title" type="text" name="title" className={css.input} value={formik.values.title} onChange={formik.handleChange} />
+    <input id="title" type="text" name="title" className={css.input} value={formik.values.title} onChange={formik.handleChange} onBlur={formik.handleBlur} />
     <ErrorMessage
   name="title"
   component="div"
   className={css.error}
 />
-  {formik.touched.title && formik.errors.title}
   </div>
 
   <div className={css.formGroup}>

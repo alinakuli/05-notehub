@@ -1,19 +1,18 @@
 // import { useState } from 'react'
 import css from './App.module.css';
 import toast, { Toaster } from 'react-hot-toast';
-import { useMutation, useQueryClient, useQuery, keepPreviousData } from '@tanstack/react-query'
+import {  useQuery, keepPreviousData } from '@tanstack/react-query'
 import SearchBox from '../SearchBox/SearchBox.tsx';
 import Pagination from '../Pagination/Pagination.tsx';
 import Modal from '../Modal/Modal.tsx';
 import { StrictMode, useEffect, useState } from 'react';
-import { fetchNotes, deleteNote } from '../../services/noteService.ts';
+import { fetchNotes } from '../../services/noteService.ts';
 import NoteList from '../NoteList/NoteList.tsx';
 import { useDebouncedCallback } from 'use-debounce';
 import NoteForm from '../NoteForm/NoteForm.tsx';
 
 export default function App() {
   const noResults = () => toast('No notes found for your request.');
-  const queryClient = useQueryClient();
   
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
@@ -51,13 +50,6 @@ export default function App() {
   const onClose = () => {
     setIsModalOpen(false);
   }
-  
-const deleteMutation = useMutation({
-  mutationFn: deleteNote,
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['notes'] });
-  },
-});
 
   useEffect(() => {
   if (isLoading) toast('Loading notes...');
@@ -96,7 +88,6 @@ const deleteMutation = useMutation({
             </Modal>)}
           {notes.length > 0 ? <NoteList
   notes={notes}
-  onDeleteNote={(note) => deleteMutation.mutate(note.id)}
 /> : null}
         </div>
         <Toaster />
