@@ -26,7 +26,7 @@ export default function NoteList({ notes }: NoteListProps) {
       <p className={css.content}>{note.content}</p>
       <div className={css.footer}>
         <span className={css.tag}>{note.tag}</span>
-        <button className={css.deleteButton} onClick={() => deleteMutation.mutate(note.id)}>
+        <button className={css.button} onClick={() => deleteMutation.mutate(note.id)}>
           Delete
         </button>
       </div>
