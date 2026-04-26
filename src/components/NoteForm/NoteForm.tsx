@@ -1,0 +1,86 @@
+import css from './NoteForm.module.css';
+import { useFormik } from 'formik';
+import type { Note } from '../../types/note.ts';
+
+interface NoteFormProps {
+  onClose: () => void;
+  onCreateNote: (note: Note) => void;
+}
+
+export default function NoteForm({ onClose, onCreateNote }: NoteFormProps) {
+
+
+  const formik = useFormik({
+    initialValues: {
+      id: 0,
+      title: '',
+      content: '',
+      tag: 'Todo',
+    },
+  onSubmit: async (values, { resetForm }) => {
+  try {
+    await onCreateNote(values); //
+    resetForm();
+    onClose();
+  } catch (error) {
+    console.error(error);
+  }
+},
+},);
+
+  return (
+    <>
+    <form className={css.form} onSubmit={formik.handleSubmit}>
+  <div className={css.formGroup}>
+    <label htmlFor="title">Title</label>
+    <input id="title" type="text" name="title" className={css.input} value={formik.values.title} onChange={formik.handleChange} />
+    <span className={css.error}>
+  {formik.touched.title && formik.errors.title}
+</span>
+  </div>
+
+  <div className={css.formGroup}>
+    <label htmlFor="content">Content</label>
+    <textarea
+      id="content"
+      name="content"
+      rows={8}
+      className={css.textarea}
+      value={formik.values.content}
+      onChange={formik.handleChange}
+    />
+    <span className={css.error}>
+  {formik.touched.content && formik.errors.content}
+</span>
+  </div>
+
+  <div className={css.formGroup}>
+    <label htmlFor="tag">Tag</label>
+    <select id="tag" name="tag" className={css.select} value={formik.values.tag} onChange={formik.handleChange}>
+      <option value="Todo">Todo</option>
+      <option value="Work">Work</option>
+      <option value="Personal">Personal</option>
+      <option value="Meeting">Meeting</option>
+      <option value="Shopping">Shopping</option>
+    </select>
+    <span className={css.error}>
+  {formik.touched.tag && formik.errors.tag}
+</span>
+  </div>
+
+  <div className={css.actions}>
+    <button type="button" className={css.cancelButton} onClick={onClose}>
+      Cancel
+    </button>
+    <button
+            type="submit"
+            className={css.submitButton}
+            disabled={formik.isSubmitting}
+    >
+      Create note
+    </button>
+  </div>
+      </form>
+      </>
+  );
+}
